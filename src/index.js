@@ -35,7 +35,29 @@ function checksCreateTodosUserAvailability(request, response, next) {
 }
 
 function checksTodoExists(request, response, next) {
+  const { username } = request.headers;
+  const { id } = request.params;
 
+  const user = users.find(user => user.username === username);
+  const isUUIDValid = validate(id);
+
+  if (!user) {
+    return response.status(404);
+  } else if (isUUIDValid === false) {
+    return response.status(400);
+  }
+
+  const todo = user.todos.find(todo => todo.id === id);
+
+  if (!todo) {
+    return response.status(404);
+  }
+
+
+  request.user = user;
+  request.todo = todo;
+
+  return next();
 }
 
 function findUserById(request, response, next) {
